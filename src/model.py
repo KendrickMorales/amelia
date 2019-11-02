@@ -34,6 +34,15 @@ class BruiseDetector():
     def summary(self):
         return self.model.summary()
 
+    def save(self, fname):
+        return self.model.save(fname)
+
+    def save_weights(self, fname):
+        return self.model.save_weights(fname)
+
+    def load_weights(self, fname):
+        return self.model.load_weights(fname)
+
 
 if __name__ == "__main__":
     model = BruiseDetector()
