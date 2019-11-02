@@ -1,22 +1,35 @@
-from keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+# import wget
+# import tarfile
+from six.moves.urllib.request import urlretrieve
+import zipfile
+import os
 
 
 def download_data():
-    pass
+    url = "https://docs.google.com/uc?export=download&id=10PXTNE82dZZkV7SQRiG38Pofe9QOeBBQ"
+    filename, _ = urlretrieve(url, "data.zip")
+    zfile = zipfile.ZipFile(filename)
+    zfile.extractall(".")
 
 
 def is_data_dowloaded():
-    pass
+    train_data = os.path.exists('data/train')
+    test_data = os.path.exists('data/test')
+
+    return (train_data and test_data)
 
 
 def load_dataset(batch_size=16):
 
+    if not is_data_dowloaded():
+        download_data()
+
     # this is the augmentation configuration we will use for training
-    train_datagen = ImageDataGenerator(
-            rescale=1. / 255,
-            shear_range=0.2,
-            zoom_range=0.2,
-            horizontal_flip=True)
+    train_datagen = ImageDataGenerator(rescale=1. / 255.,
+                                       shear_range=0.2,
+                                       zoom_range=0.2,
+                                       horizontal_flip=True)
 
     # this is the augmentation configuration we will use for testing:
     # only rescaling
@@ -39,3 +52,7 @@ def load_dataset(batch_size=16):
             class_mode='binary')
 
     return train_generator, test_generator
+
+
+if __name__ == "__main__":
+    load_dataset()
