@@ -1,6 +1,14 @@
 from keras.preprocessing.image import ImageDataGenerator
 
 
+def download_data():
+    pass
+
+
+def is_data_dowloaded():
+    pass
+
+
 def load_dataset(batch_size=16):
 
     # this is the augmentation configuration we will use for training
