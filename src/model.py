@@ -12,7 +12,7 @@ class BruiseDetector():
         x = resnet.output
         x = Flatten()(x)
         x = Dense(1024, activation='relu')(x)
-        x = Dense(2, activation='softmax')(x)
+        x = Dense(1, activation='softmax')(x)
 
         self.model = Model(resnet.input, x)
 
@@ -20,9 +20,13 @@ class BruiseDetector():
                            loss='binary_crossentropy',
                            metrics=['accuracy'])
 
-    def fit(self, x_train, y_train, batch=5, epochs=100):
-        return self.model.fit(x_train, y_train,
-                              batch=batch, epochs=epochs)
+    def fit(self, train_gen, batch_size=16, test_gen=None, epochs=100):
+        return self.model.fit_generator(
+            train_gen,
+            steps_per_epoch=1,
+            epochs=epochs,
+            validation_data=test_gen,
+            validation_steps=1)
 
     def predict(self, x):
         return self.model.predict(x)
