@@ -5,28 +5,35 @@ from tensorflow.keras.applications.resnet50 import ResNet50
 
 
 class BruiseDetector():
-    def __init__(self):
+    def __init__(self, input_shape):
         super(BruiseDetector, self).__init__()
-        resnet = ResNet50(weights='imagenet', input_shape=(300, 300, 3),
-                          include_top=False, classes=2)
+        resnet = ResNet50(weights='imagenet', input_shape=input_shape,
+                          include_top=False)
         x = resnet.output
         x = Flatten()(x)
         x = Dense(1024, activation='relu')(x)
-        x = Dense(1, activation='softmax')(x)
+        x = Dense(101, activation='softmax')(x)
 
         self.model = Model(resnet.input, x)
 
-        self.model.compile(optimizer='adam',
-                           loss='binary_crossentropy',
+        self.model.compile(optimizer='SGD',
+                           loss='categorical_crossentropy',
                            metrics=['accuracy'])
 
-    def fit(self, train_gen, batch_size=16, test_gen=None, epochs=100):
+    def fit_gen(self, train_gen, batch_size=16, test_gen=None, epochs=100, steps_per_epoch=10):
         return self.model.fit_generator(
             train_gen,
-            steps_per_epoch=1,
+            steps_per_epoch=steps_per_epoch,
             epochs=epochs,
             validation_data=test_gen,
             validation_steps=1)
+    
+    def fit(self, X, y, batch_size=16, test_gen=None, epochs=100):
+        return self.model.fit(
+            X, y,
+            batch_size=batch_size,
+            epochs=epochs,
+            validation_split=0.2)
 
     def predict(self, x):
         return self.model.predict(x)
